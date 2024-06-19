@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Jobs\UpdateDuckDataJob;
 use App\Models\DuckModel;
-use Illuminate\Support\Collection;
 use Tests\TestCase;
 
 class UpdateDuckDataJobTest extends TestCase
