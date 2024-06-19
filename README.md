@@ -1,17 +1,18 @@
-# Living, Breathing, Walking Duck
+# Duck Behavior Simulation and Management
 
-This is a sample Laravel application simulating a living, breathing, walking duck. The project demonstrates the use of Laravel 10, PHP 8.2, MongoDB, job queues, and the Strategy Design Pattern.
+This repository provides a comprehensive system to simulate and manage duck behaviors using Laravel and MongoDB. Key features include:
 
 ## Features:
 
-- Simulate duck behaviors (walking, breathing, quacking).
-- Store and manage duck data in MongoDB.
-- Efficiently handle and query large collections.
-- Quick search functionality with various parameters.
-- Delete and update duck records using jobs.
-- Use of console commands to update duck data.
-- Caching to improve performance.
-
+- **Simulate Duck Behaviors:** Generate realistic duck behaviors such as walking, breathing, and quacking using Faker for random data.
+- **MongoDB Integration:** Store and manage duck data efficiently using MongoDB.
+- **Efficient Data Handling:** Handle and query large collections of duck data with optimized performance.
+- **Quick Search Functionality:** Implement quick search capabilities with various parameters to find specific duck records.
+- **CRUD Operations Using Jobs:** Use Laravel jobs to delete, update, and manage duck records asynchronously, improving performance and scalability.
+- **Console Commands:** Utilize console commands to trigger updates and manage duck data.
+- **Automated Updates:** A console command runs every 5 minutes to randomly update duck information, ensuring dynamic and up-to-date data.
+- **Caching for Performance:** Implement caching mechanisms to enhance query performance and reduce load times.
+- **Unit Testing:** Write comprehensive unit tests to ensure the reliability and accuracy of the application.
 ## Setup Instructions:
 
 ### Clone the repository:
