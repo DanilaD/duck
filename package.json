@@ -1,0 +1,17 @@
+{
+    "private": true,
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "mix": "mix"
+    },
+    "devDependencies": {
+        "@popperjs/core": "^2.0.0",
+        "bootstrap": "^5.0.0",
+        "laravel-mix": "^6.0.0",
+        "resolve-url-loader": "^5.0.0",
+        "sass": "^1.32.0",
+        "sass-loader": "^10.1.1",
+        "vue": "^3.0.0"
+    }
+}
