@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\DuckModel;
+use App\Models\StatusModel;
 use Faker\Factory;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -45,7 +46,7 @@ class UpdateDuckDataJob implements ShouldQueue
 
     private function getStatus(): string
     {
-        return $this->faker->randomElement(['active', 'resting', 'feeding', 'sleeping']);
+        return $this->faker->randomElement(StatusModel::pluck('name')->toArray());
     }
 
     private function getIsWalking(string $status): bool
