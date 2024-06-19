@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Helpers\MongoDBConnection;
 use App\Models\DuckModel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -9,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use MongoDB\Client;
 
 class DeleteDuckJob implements ShouldQueue
 {
@@ -35,17 +37,21 @@ class DeleteDuckJob implements ShouldQueue
     public function handle()
     {
         try {
-            // Find the duck by its ID or fail
-            $duck = DuckModel::findOrFail($this->id);
+            // Get the MongoDB collection
+            $collection = MongoDBConnection::getCollection('ducks');
 
-            // Delete the duck
-            $duck->delete();
+            // Execute a raw query to delete the duck by its ID
+            $result = $collection->deleteOne(['_id' => new \MongoDB\BSON\ObjectId($this->id)]);
 
-            // Log a success message
-            Log::info('Duck deleted successfully', ['id' => $this->id]);
+            // Check if a document was deleted
+            if ($result->getDeletedCount() > 0) {
+                Log::info('Duck deleted successfully', ['id' => $this->id]);
+            } else {
+                Log::warning('No duck found to delete', ['id' => $this->id]);
+            }
         } catch (\Exception $e) {
             // Log an error message if something goes wrong
-            Log::error('Error updating duck', ['id' => $this->id, 'error' => $e->getMessage()]);
+            Log::error('Error deleting duck', ['id' => $this->id, 'error' => $e->getMessage()]);
         }
     }
 }
