@@ -1,115 +1,74 @@
 <?php
 
-namespace App\Jobs;
+namespace App\Console\Commands;
 
+use App\Jobs\UpdateDuckDataJob;
 use App\Models\DuckModel;
-use Faker\Factory;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
+use Carbon\CarbonInterval;
+use Illuminate\Console\Command;
 
-class UpdateDuckDataJob implements ShouldQueue
+class changeData extends Command
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    // The name and signature of the console command
+    protected $signature = 'ducks:update';
 
-    // Collection of ducks to be processed by the job
-    protected $ducks;
-
-    // Faker instance for generating random data
-    protected $faker;
+    // The console command description
+    protected $description = 'Generate new data for ducks';
 
     /**
-     * Create a new job instance.
+     * Create a new command instance.
      *
-     * @param Collection $ducks Collection of DuckModel instances
      * @return void
      */
-    public function __construct(Collection $ducks)
+    public function __construct()
     {
-        $this->ducks = $ducks;
-        $this->faker = Factory::create();
+        parent::__construct();
     }
 
     /**
-     * Execute the job.
+     * Execute the console command.
      *
      * @return void
      */
     public function handle()
     {
-        // Iterate through each duck in the collection and update its data
-        foreach ($this->ducks as $duck) {
-            $this->updateDuckData($duck);
-        }
+        // Log the start of the command execution
+        $this->info("Starting...");
+
+        // Record the start time to calculate elapsed time later
+        $start = microtime(true);
+
+        // Process ducks in chunks to handle large datasets efficiently
+        DuckModel::chunk(5000, function ($ducks) {
+            // Dispatch a job for each chunk of ducks
+            UpdateDuckDataJob::dispatch($ducks);
+            $this->info("Created a Job.");
+        });
+
+        // Calculate the elapsed time and log it
+        $time = $this->calculateElapsedTime($start);
+        $this->info("Time elapsed: $time");
+        $this->info("Completed.");
     }
 
     /**
-     * Get a random status for a duck.
+     * Calculate and format the elapsed time.
      *
-     * @return string
+     * @param string $start The start time in microseconds
+     * @return string The formatted elapsed time
      */
-    private function getStatus(): string
+    private function calculateElapsedTime(string $start): string
     {
-        return $this->faker->randomElement(['active', 'resting', 'feeding', 'sleeping']);
-    }
+        // Record the finish time
+        $finish = microtime(true);
 
-    /**
-     * Determine if the duck is walking based on its status.
-     *
-     * @param string $status
-     * @return bool
-     */
-    private function getIsWalking(string $status): bool
-    {
-        return in_array($status, ['active']) ? $this->faker->boolean(70) : false;
-    }
+        // Calculate the elapsed time in seconds
+        $timeElapsed = $finish - $start;
 
-    /**
-     * Determine if the duck is quacking based on its status.
-     *
-     * @param string $status
-     * @return bool
-     */
-    private function getIsQuacking(string $status): bool
-    {
-        return in_array($status, ['active', 'feeding']) ? $this->faker->boolean(30) : false;
-    }
+        // Convert the elapsed time into a CarbonInterval object
+        $interval = CarbonInterval::seconds($timeElapsed);
 
-    /**
-     * Update the duck's data with random values.
-     *
-     * @param DuckModel $duck The duck model to be updated
-     * @return void
-     */
-    private function updateDuckData(DuckModel $duck): void
-    {
-        // Generate random status, walking, and quacking states for the duck
-        $status = $this->getStatus();
-        $is_walking = $this->getIsWalking($status);
-        $is_quacking = $this->getIsQuacking($status);
-
-        // Update the duck model with the new random data
-        $duck->update([
-            'health' => $this->faker->numberBetween(1, 100),
-            'status' => $status,
-            'last_fed_time' => $this->faker->dateTimeBetween($duck->last_fed_time, 'now'),
-            'behaviors' => [
-                'walking' => [
-                    'is_walking' => $is_walking,
-                    'speed' => $is_walking ? $this->faker->randomFloat(2, 0.5, 2.0) : 0.0,
-                ],
-                'breathing' => [
-                    'is_breathing' => true,
-                    'rate' => $this->faker->randomNumber(2)
-                ],
-                'quacking' => [
-                    'is_quacking' => $is_quacking,
-                    'volume' => $is_quacking ? $this->faker->randomElement(['low', 'medium', 'high']) : 0,
-                ]
-            ]
-        ]);
+        // Format the interval into a human-readable string
+        return $interval->cascade()->forHumans();
     }
 }
