@@ -17,7 +17,7 @@ This is a sample Laravel application simulating a living, breathing, walking duc
 ### Clone the repository:
 
 ```sh
-git clone <repository_url>
+git clone git@github.com:DanilaD/duck.git
 cd <repository_folder>
 ```
 
